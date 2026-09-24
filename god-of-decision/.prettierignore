@@ -1,0 +1,7 @@
+# Build output and dependencies
+.next
+node_modules
+next-env.d.ts
+
+# Generated or third-party assets
+public

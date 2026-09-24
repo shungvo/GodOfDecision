@@ -1,0 +1,15 @@
+{
+    "tabWidth": 4,
+    "printWidth": 80,
+    "semi": true,
+    "singleQuote": false,
+    "trailingComma": "all",
+    "arrowParens": "always",
+    "overrides": [
+        {
+            "comment": "CSS, JSON and Markdown were already written at two spaces, and there is nothing to gain from widening them.",
+            "files": ["*.css", "*.json", "*.md", "*.webmanifest"],
+            "options": { "tabWidth": 2 }
+        }
+    ]
+}

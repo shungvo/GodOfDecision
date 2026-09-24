@@ -1,0 +1,20 @@
+{
+  "users": [
+    {
+      "id": 1,
+      "email": "test@god.local",
+      "passwordHash": "f91219724dcaeaf0b876944f31a0c5fb:40a01efba511f82eaf05503f4ae719fa9332f6e9bc8504dfd5d714100c377be6e151a197cf61af878df561ad0c8bee72d88e70551dc46d1872e2c477df8660a8",
+      "createdAt": "2026-08-09T17:06:28.356Z",
+      "tokensUsed": 1126,
+      "tokensUsedOn": "2026-08-10"
+    },
+    {
+      "id": 2,
+      "email": "ui@god.local",
+      "passwordHash": "fdca635fd605962b8d01bd9f72a7ea8f:982e00d99c41de436729e582c03c02a523787b2450448efc97d912be2eb49a5def4ec8b630cd7204942b25c6f426e21ab3d44c35c1d329af2a4bbbcd05c8103c",
+      "createdAt": "2026-08-09T17:15:22.529Z",
+      "tokensUsed": 2057,
+      "tokensUsedOn": "2026-08-10"
+    }
+  ]
+}

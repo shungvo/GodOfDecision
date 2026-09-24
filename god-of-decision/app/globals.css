@@ -1,0 +1,462 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+  --font-heading: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+
+  /* GodOfDecision */
+  --color-primary-900: #34117e;
+  --color-primary-800: #491ab1;
+  --color-primary-700: #6631db;
+  --color-primary-600: #7b45f0;
+
+  --color-secondary-300: #a981ff;
+  --color-secondary-200: #b796fe;
+  --color-secondary-100: #d0bcfc;
+
+  --color-magic-gold: #fbbf24;
+
+  /* Text on white surfaces */
+  --color-ink: #1e1b4b;
+  --color-ink-soft: #6b7280;
+
+  --color-canvas: #f8f5ff;
+
+  /* ========================================
+     Elevation
+
+     One scale, four steps. Higher means closer
+     to the reader and more important on the
+     screen. Never put two e4 surfaces on the
+     same screen.
+
+     e1  quiet    list rows, tiles, chips
+     e2  normal   standard cards
+     e3  raised   the primary action, nav
+     e4  focal    the one thing the screen is about
+
+     Each step stacks four things, which is what
+     reads as a solid object rather than a flat
+     rectangle with a blur behind it:
+
+       inset    a soft shade along the bottom edge,
+                so the surface looks slightly domed
+       contact  a tight dark shadow right under it
+       form     the main mid distance shadow
+       bounce   a wide violet glow, the canvas
+                colour reflecting back up
+     ======================================== */
+
+  --shadow-e1:
+    inset 0 -1px 2px rgb(26 10 74 / 4%), 0 1px 1px rgb(26 10 74 / 7%),
+    0 2px 5px rgb(26 10 74 / 8%), 0 4px 10px rgb(123 69 240 / 8%);
+
+  --shadow-e2:
+    inset 0 -2px 3px rgb(26 10 74 / 5%), 0 1px 2px rgb(26 10 74 / 9%),
+    0 5px 10px rgb(26 10 74 / 11%), 0 12px 24px rgb(26 10 74 / 13%),
+    0 16px 32px rgb(123 69 240 / 14%);
+
+  --shadow-e3:
+    inset 0 -2px 4px rgb(26 10 74 / 6%), 0 2px 3px rgb(26 10 74 / 11%),
+    0 7px 14px rgb(26 10 74 / 14%), 0 18px 34px rgb(26 10 74 / 18%),
+    0 26px 52px rgb(123 69 240 / 22%);
+
+  --shadow-e4:
+    inset 0 -3px 6px rgb(26 10 74 / 7%), 0 3px 5px rgb(26 10 74 / 13%),
+    0 12px 22px rgb(26 10 74 / 18%), 0 28px 50px rgb(26 10 74 / 24%),
+    0 40px 76px rgb(123 69 240 / 30%);
+
+  /* shadcn */
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
+}
+
+/* ========================================
+   GodOfDecision Theme
+   ======================================== */
+
+:root {
+  /*
+   * --canvas-top, the colour of the canvas' first row, is NOT set
+   * here. It lives in lib/theme.ts and is written onto <html> by
+   * app/layout.tsx, because the same value also has to reach the
+   * page metadata that iOS paints the status bar with. Declaring it
+   * in both places is how the two silently drift apart.
+   */
+
+  /*
+   * The app canvas. Declared once so the launch screen can wear
+   * the same background and the fade between them is invisible.
+   *
+   * The first layer flattens the top of the canvas to --canvas-top
+   * before fading out. Without it the top row runs from #5223c9 at
+   * the centre to roughly #4319a6 at the corners — a gradient that
+   * no single flat status bar colour can match. Flattening it is
+   * what makes the match exact rather than close.
+   */
+  --canvas-gradient:
+    linear-gradient(180deg, var(--canvas-top) 0, transparent 72px),
+    radial-gradient(120% 75% at 50% 0%, #5223c9 0%, transparent 60%),
+    linear-gradient(180deg, #3d1596 0%, #34117e 45%, #2b0d68 100%);
+
+  /* App */
+  --background: #34117e;
+  --foreground: #ffffff;
+
+  /* GodOfDecision primary */
+  --primary: #7b45f0;
+  --primary-foreground: #ffffff;
+
+  /* Cards */
+  --card: #ffffff;
+  --card-foreground: #171717;
+
+  /* Popover */
+  --popover: #ffffff;
+  --popover-foreground: #171717;
+
+  /* Secondary */
+  --secondary: #6631db;
+  --secondary-foreground: #ffffff;
+
+  /* Muted */
+  --muted: #491ab1;
+  --muted-foreground: #ddd0ff;
+
+  /* Accent */
+  --accent: #7b45f0;
+  --accent-foreground: #ffffff;
+
+  /* Destructive */
+  --destructive: oklch(0.577 0.245 27.325);
+
+  /* UI */
+  --border: rgb(255 255 255 / 12%);
+  --input: rgb(255 255 255 / 15%);
+  --ring: #7b45f0;
+
+  /* Charts */
+  --chart-1: #7b45f0;
+  --chart-2: #6631db;
+  --chart-3: #491ab1;
+  --chart-4: #34117e;
+  --chart-5: #b79aff;
+
+  --radius: 0.75rem;
+
+  /* Sidebar */
+  --sidebar: #34117e;
+  --sidebar-foreground: #ffffff;
+  --sidebar-primary: #7b45f0;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #491ab1;
+  --sidebar-accent-foreground: #ffffff;
+  --sidebar-border: rgb(255 255 255 / 12%);
+  --sidebar-ring: #7b45f0;
+}
+
+.dark {
+  --background: #34117e;
+  --foreground: #ffffff;
+
+  --card: #491ab1;
+  --card-foreground: #ffffff;
+
+  --popover: #491ab1;
+  --popover-foreground: #ffffff;
+
+  --primary: #7b45f0;
+  --primary-foreground: #ffffff;
+
+  --secondary: #6631db;
+  --secondary-foreground: #ffffff;
+
+  --muted: #491ab1;
+  --muted-foreground: #ddd0ff;
+
+  --accent: #6631db;
+  --accent-foreground: #ffffff;
+
+  --destructive: oklch(0.704 0.191 22.216);
+
+  --border: rgb(255 255 255 / 12%);
+  --input: rgb(255 255 255 / 15%);
+  --ring: #7b45f0;
+
+  --chart-1: #7b45f0;
+  --chart-2: #6631db;
+  --chart-3: #491ab1;
+  --chart-4: #34117e;
+  --chart-5: #b79aff;
+
+  --sidebar: #34117e;
+  --sidebar-foreground: #ffffff;
+  --sidebar-primary: #7b45f0;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #491ab1;
+  --sidebar-accent-foreground: #ffffff;
+  --sidebar-border: rgb(255 255 255 / 12%);
+  --sidebar-ring: #7b45f0;
+}
+
+/* ========================================
+   Base
+   ======================================== */
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+
+  html {
+    @apply font-sans;
+
+    /*
+     * The tarot fan is wider than the screen on purpose.
+     * `clip` stops that becoming a horizontal scrollbar
+     * without turning the page into a scroll container,
+     * which `hidden` would do.
+     */
+    /*
+     * The document scrolls, deliberately.
+     *
+     * Locking the shell to the viewport height was tried and
+     * reverted: on iOS standalone the reported height is the
+     * very thing that is wrong, so pinning to it put the lower
+     * part of the page off screen with no way to reach it.
+     * A scrollable document is at worst cosmetically off for
+     * one gesture; an unscrollable one is unusable.
+     */
+    overflow-x: clip;
+    min-height: 100%;
+
+    /*
+     * This is what iOS paints the status bar / Dynamic Island strip
+     * with in an installed web app — the document's canvas colour,
+     * which propagates from <html>. Not `theme-color`, and not the
+     * manifest: those were both set correctly while the strip stayed
+     * on the old `--background`, which is how this was found.
+     *
+     * So it has to be --canvas-top, the colour of the page's first
+     * row, or the strip and the page are two different purples.
+     */
+    background: var(--canvas-top);
+    color-scheme: dark;
+  }
+
+  body {
+    @apply text-foreground;
+
+    min-height: 100dvh;
+    margin: 0;
+
+    overflow-x: clip;
+
+    /* Deep violet canvas. White surfaces sit on top of it. */
+    background: var(--canvas-gradient);
+    background-attachment: fixed;
+
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  button,
+  a {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  button {
+    touch-action: manipulation;
+  }
+
+  input,
+  textarea,
+  select {
+    font-size: 16px;
+  }
+}
+
+@keyframes skeleton-sweep {
+  from {
+    background-position: 150% 0;
+  }
+  to {
+    background-position: -150% 0;
+  }
+}
+
+/*
+ * One ring of light leaving the oracle disc.
+ *
+ * A keyframe rather than Tailwind's `animate-ping`, which loops: this
+ * marks a moment that happens once, and a pulse that kept going would
+ * turn it into a status indicator.
+ *
+ * Only transform and opacity, so it runs on the compositor and the
+ * answer rendering underneath cannot make it stutter.
+ */
+@keyframes oracle-ping {
+  from {
+    transform: scale(1);
+    opacity: 0.55;
+  }
+  to {
+    transform: scale(2.4);
+    opacity: 0;
+  }
+}
+
+@layer utilities {
+  .canvas {
+    background: var(--canvas-gradient);
+    background-attachment: fixed;
+  }
+
+  /**
+   * Loading placeholder.
+   *
+   * A light sweeps across it rather than the whole block
+   * pulsing, which reads as "something is coming" instead of
+   * "something is broken".
+   *
+   * Pair `.skeleton` with a tone; the tone only sets the two
+   * colours the sweep interpolates between.
+   */
+  .skeleton {
+    background-image: linear-gradient(
+      90deg,
+      var(--skeleton-base) 0%,
+      var(--skeleton-highlight) 50%,
+      var(--skeleton-base) 100%
+    );
+    background-size: 250% 100%;
+    background-repeat: no-repeat;
+
+    animation: skeleton-sweep 1.5s linear infinite;
+  }
+
+  /* On the violet canvas, or any dark surface. */
+  .skeleton-dark {
+    --skeleton-base: rgb(255 255 255 / 9%);
+    --skeleton-highlight: rgb(255 255 255 / 22%);
+  }
+
+  /* On a white card. */
+  .skeleton-light {
+    --skeleton-base: rgb(30 27 75 / 7%);
+    --skeleton-highlight: rgb(30 27 75 / 15%);
+  }
+
+  /**
+   * A white surface that catches light from above.
+   *
+   * The gradient is what stops a card reading as a
+   * flat sticker. Pair it with any shadow-e* step.
+   */
+  .surface {
+    background-image: linear-gradient(
+      170deg,
+      #ffffff 0%,
+      #ffffff 55%,
+      var(--color-canvas) 100%
+    );
+  }
+
+  /**
+   * Frosted violet panel for controls that sit
+   * directly on the canvas.
+   */
+  .glass {
+    background-color: rgb(255 255 255 / 12%);
+    backdrop-filter: blur(14px) saturate(140%);
+    -webkit-backdrop-filter: blur(14px) saturate(140%);
+    border: 1px solid rgb(255 255 255 / 22%);
+    box-shadow:
+      inset 0 1px 0 rgb(255 255 255 / 25%),
+      0 6px 18px rgb(26 10 74 / 18%);
+  }
+
+  .safe-top {
+    padding-top: env(safe-area-inset-top);
+  }
+
+  .safe-bottom {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  .safe-left {
+    padding-left: env(safe-area-inset-left);
+  }
+
+  .safe-right {
+    padding-right: env(safe-area-inset-right);
+  }
+
+  .safe-x {
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
+  }
+
+  .safe-y {
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+}
+/* Motion off: keep the placeholder, drop the sweep. */
+@media (prefers-reduced-motion: reduce) {
+  .skeleton {
+    background-image: none;
+    background-color: var(--skeleton-base);
+    animation: none;
+  }
+}
