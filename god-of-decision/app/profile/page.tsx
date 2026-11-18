@@ -103,7 +103,7 @@ export default function ProfilePage() {
     const empty = hydrated && stats.total === 0;
 
     return (
-        <Screen title="Hồ sơ">
+        <Screen title="Hồ sơ" lumi="profile_hello">
             {/* ==========================================
           WHO
 

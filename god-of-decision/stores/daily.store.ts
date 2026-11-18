@@ -14,6 +14,12 @@ interface DailyState {
     revealedOn: string | null;
 
     /**
+     * Every day (YYYY-MM-DD) a card was turned, newest last, capped.
+     * Feeds the ritual streak on Home.
+     */
+    revealDays: string[];
+
+    /**
      * The day the cached reading belongs to.
      *
      * Kept beside the reading rather than trusting `revealedOn`,
@@ -57,6 +63,7 @@ export const useDailyStore = create<DailyState>()(
     persist(
         (set, get) => ({
             revealedOn: null,
+            revealDays: [],
 
             readingFor: null,
             reading: null,
@@ -66,7 +73,12 @@ export const useDailyStore = create<DailyState>()(
             readErrorStatus: null,
 
             reveal(day) {
-                set({ revealedOn: day });
+                const days = get().revealDays.filter((d) => d !== day);
+
+                set({
+                    revealedOn: day,
+                    revealDays: [...days, day].slice(-60),
+                });
             },
 
             async readMeaning(day, slug) {
@@ -165,6 +177,7 @@ export const useDailyStore = create<DailyState>()(
 
                 return {
                     revealedOn: state.revealedOn,
+                    revealDays: state.revealDays,
                     readingFor: settled ? state.readingFor : null,
                     reading: settled ? state.reading : null,
                 };

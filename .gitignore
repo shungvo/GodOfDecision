@@ -53,3 +53,5 @@ playwright-report/
 
 # VS Code specific
 .vscode-settings-sync.json
+# Raw 3D exports. Too large for git; the optimized copy lives in public/
+design/**/*-source.glb

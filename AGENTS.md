@@ -39,6 +39,9 @@ Colors, radius, shadows, typography.
 docs/UI_RULES.md
 Layout and animation rules.
 
+docs/MASCOT.md
+The chibi wizard mascot: look, expressions, deliverables.
+
 docs/TAROT_ENGINE.md
 Deck, spreads and tone rules for the tarot pillar.
 

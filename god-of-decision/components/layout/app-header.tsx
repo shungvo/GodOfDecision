@@ -2,9 +2,11 @@
 
 import { Compass, Zap } from "lucide-react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 
 import { OracleMark } from "@/components/brand/oracle-mark";
+import { ProfileIcon } from "@/components/navigation/tab-icons";
 import { cn } from "@/lib/utils";
 import { useAuthStore } from "@/stores/auth.store";
 
@@ -39,9 +41,9 @@ function compact(value: number) {
  * flush against the top of the viewport rather than inset, which is
  * what makes it read as chrome instead of as page content.
  *
- * Two controls: the day's analysis allowance, and the 78 card library
- * — the only screen with no bottom tab, so it would otherwise be
- * reachable from Home alone.
+ * Three controls: the day's analysis allowance, the 78 card library,
+ * and the profile — none of which has a bottom tab. The profile moved
+ * up here when the oracle became the orb in the middle of the dock.
  *
  * The streak pill used to sit here too. Three controls plus the
  * lockup do not fit a 375pt bar: the tagline wrapped to a second
@@ -55,6 +57,8 @@ export function AppHeader() {
     const [lifted, setLifted] = useState(false);
 
     const quota = useAuthStore((state) => state.quota);
+    const user = useAuthStore((state) => state.user);
+    const onProfile = usePathname().startsWith("/profile");
     const loadAuth = useAuthStore((state) => state.load);
 
     /*
@@ -241,6 +245,35 @@ export function AppHeader() {
                             className="h-[18px] w-[18px]"
                             aria-hidden="true"
                         />
+                    </Link>
+
+                    {/* ------------------------------------
+                        PROFILE
+
+                        The signed in user's initial on a
+                        violet coin; a guest gets the outline
+                        figure. Ringed in gold while the
+                        profile is the screen you are on.
+                    ------------------------------------- */}
+                    <Link
+                        href="/profile"
+                        aria-label="Hồ sơ"
+                        aria-current={onProfile ? "page" : undefined}
+                        className={cn(
+                            "flex h-9 w-9 items-center justify-center rounded-full",
+                            "text-white transition active:scale-95",
+                            user
+                                ? "bg-gradient-to-br from-secondary-300 to-primary-700 text-[15px] font-extrabold uppercase"
+                                : "glass",
+                            onProfile &&
+                                "outline-2 outline-offset-2 outline-magic-gold",
+                        )}
+                    >
+                        {user ? (
+                            user.email.charAt(0)
+                        ) : (
+                            <ProfileIcon className="h-[19px] w-[19px]" />
+                        )}
                     </Link>
                 </div>
             </div>

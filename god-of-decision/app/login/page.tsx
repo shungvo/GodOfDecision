@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useState, type FormEvent } from "react";
 
-import { OracleMark } from "@/components/brand/oracle-mark";
+import { LumiPeek } from "@/components/mascot/lumi-peek";
 import { useAuthStore } from "@/stores/auth.store";
 
 type Mode = "login" | "register";
@@ -92,7 +92,15 @@ function LoginForm() {
         =========================================== */}
 
                 <div className="flex flex-col items-center text-center">
-                    <OracleMark className="h-16 w-16 ring-white/40" />
+                    <LumiPeek
+                        size="lg"
+                        bubble="above"
+                        moment={
+                            mode === "login"
+                                ? "login_welcome"
+                                : "signup_welcome"
+                        }
+                    />
 
                     <h1 className="mt-4 text-[24px] font-extrabold text-white">
                         {mode === "login"

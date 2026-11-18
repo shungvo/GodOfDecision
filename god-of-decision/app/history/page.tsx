@@ -6,6 +6,8 @@ import Link from "next/link";
 import { useState } from "react";
 
 import { Screen } from "@/components/layout/screen";
+import { LumiSays } from "@/components/mascot/lumi-says";
+import { SheetMascot } from "@/components/mascot/sheet-mascot";
 import { BottomSheet } from "@/components/ui/bottom-sheet";
 import { useHydrated } from "@/hooks/use-hydrated";
 import { topicLabel } from "@/lib/topics";
@@ -51,7 +53,11 @@ export default function HistoryPage() {
     const [selected, setSelected] = useState<HistoryEntry | null>(null);
 
     return (
-        <Screen title="Nhật ký" subtitle="Những câu hỏi bạn đã mang tới đây.">
+        <Screen
+            title="Nhật ký"
+            subtitle="Những câu hỏi bạn đã mang tới đây."
+            lumi={hydrated && entries.length > 0 ? "history_list" : undefined}
+        >
             {!hydrated && (
                 <div className="space-y-3">
                     {[0, 1, 2].map((index) => (
@@ -62,9 +68,11 @@ export default function HistoryPage() {
 
             {hydrated && entries.length === 0 && (
                 <div className="rounded-3xl surface bg-white px-6 py-12 text-center shadow-e2">
-                    <p className="text-sm leading-6 text-ink-soft">
-                        Chưa có gì ở đây.
-                    </p>
+                    <LumiSays
+                        moment="history_empty"
+                        from="avatar"
+                        className="justify-center text-left"
+                    />
 
                     <div className="mt-6 flex justify-center gap-3">
                         <Link
@@ -198,12 +206,15 @@ export default function HistoryPage() {
                 }}
                 title={selected ? headline(selected) : undefined}
                 description={selected ? formatDate(selected.date) : undefined}
+                art={<SheetMascot mood="idle" />}
                 snapPoints={[0.5, 0.92]}
                 initialSnap={1}
                 showCloseButton
             >
                 {selected && (
                     <div className="space-y-5 pb-8">
+                        <LumiSays moment="history_view" seed={selected.date} />
+
                         {selected.pillar === "decision" ? (
                             <>
                                 <div className="rounded-3xl bg-primary-900 px-5 py-8 text-center">

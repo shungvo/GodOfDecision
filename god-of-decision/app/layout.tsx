@@ -1,5 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { SkyBackdrop } from "@/components/layout/sky-backdrop";
+import { TapSparkles } from "@/components/layout/tap-sparkles";
 import { BottomTabBar } from "@/components/navigation/bottom-tab-bar";
 import { NavOverlay } from "@/components/navigation/nav-overlay";
 import { AppGate } from "@/components/onboarding/app-gate";
@@ -109,6 +111,9 @@ export default function RootLayout({
             style={{ "--canvas-top": CANVAS_TOP } as React.CSSProperties}
         >
             <body className="antialiased">
+                {/* First, so every positioned element after it paints above. */}
+                <SkyBackdrop />
+                <TapSparkles />
                 {children}
                 <NavOverlay />
                 <BottomTabBar />

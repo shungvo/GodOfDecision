@@ -103,6 +103,7 @@ function ExploreContent() {
         <Screen
             title="Bộ bài"
             subtitle="78 lá. Chạm để đọc ý nghĩa xuôi và ngược."
+            lumi="explore_browse"
         >
             {/* ==========================================
           FILTERS

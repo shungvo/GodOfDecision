@@ -21,7 +21,9 @@ import {
 } from "@/components/tarot/spread-icons";
 import { StoryShareButton } from "@/components/share/story-share-button";
 import { DrawnCardsStrip } from "@/components/tarot/drawn-cards-strip";
-import { OracleAvatar } from "@/components/tarot/oracle-avatar";
+import { LumiPeek } from "@/components/mascot/lumi-peek";
+import { LumiSays } from "@/components/mascot/lumi-says";
+import { SheetMascot } from "@/components/mascot/sheet-mascot";
 import { TarotDeck } from "@/components/tarot/tarot-deck";
 import { BottomSheet } from "@/components/ui/bottom-sheet";
 import { Skeleton, SkeletonText } from "@/components/ui/skeleton";
@@ -155,7 +157,20 @@ export default function TarotPage() {
           SPREAD TABS
       =============================================== */}
 
-            <div className="mb-5 flex justify-center">
+            <div className="relative mb-5 flex justify-center">
+                {/* Lumi keeps the table company from the right. */}
+                <LumiPeek
+                    className="absolute right-0 top-0.5"
+                    lang={lang}
+                    moment={
+                        isDrawing || cards.length === 0
+                            ? "tarot_shuffle"
+                            : completed
+                              ? "tarot_reveal"
+                              : "tarot_pick"
+                    }
+                />
+
                 <div
                     role="tablist"
                     aria-label="Kiểu trải bài"
@@ -454,10 +469,39 @@ export default function TarotPage() {
                         </button>
                     )
                 }
-                art={<OracleAvatar />}
+                art={
+                    <SheetMascot
+                        mood={
+                            !activeTopic
+                                ? "idle"
+                                : readStatus === "reading"
+                                  ? "thinking"
+                                  : readError
+                                    ? "surprised"
+                                    : "reveal"
+                        }
+                    />
+                }
             >
                 {/* Above the swap, so the spread stays put while
                     the body changes underneath it. */}
+                <LumiSays
+                    className="mb-4"
+                    lang={lang}
+                    moment={
+                        !activeTopic
+                            ? "tarot_choose"
+                            : readStatus === "reading"
+                              ? "tarot_thinking"
+                              : readError
+                                ? readErrorStatus === 401
+                                    ? "need_login"
+                                    : "error"
+                                : "tarot_reveal"
+                    }
+                    seed={cards.map((card) => card.id ?? "").join()}
+                />
+
                 <div className="mb-5">
                     <DrawnCardsStrip cards={cards} lang={lang} />
                 </div>

@@ -6,6 +6,9 @@ import { useEffect, useRef, useState } from "react";
 
 import { DailyCard } from "@/components/home/daily-card";
 import { Screen } from "@/components/layout/screen";
+import { LumiSays } from "@/components/mascot/lumi-says";
+import { SheetMascot, moodFor } from "@/components/mascot/sheet-mascot";
+import { readingMoment } from "@/lib/lumi-lines";
 import { StoryShareButton } from "@/components/share/story-share-button";
 import { BottomSheet } from "@/components/ui/bottom-sheet";
 import { Skeleton, SkeletonText } from "@/components/ui/skeleton";
@@ -135,12 +138,22 @@ export default function HomePage() {
                 onOpenChange={setSheetOpen}
                 title={card?.name_vn}
                 description={card?.name_en}
+                art={<SheetMascot mood={moodFor(readStatus)} />}
                 snapPoints={[0.55, 0.92]}
                 initialSnap={1}
                 showCloseButton
             >
                 {card && (
                     <div className="space-y-5 pb-8">
+                        <LumiSays
+                            moment={readingMoment(
+                                "daily",
+                                readStatus,
+                                readErrorStatus,
+                            )}
+                            seed={card.slug}
+                        />
+
                         <div className="flex flex-wrap gap-2">
                             {card.keywords_vn.map((keyword) => (
                                 <span

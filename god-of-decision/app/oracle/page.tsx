@@ -7,6 +7,9 @@ import { useEffect, useRef, useState } from "react";
 import { Screen } from "@/components/layout/screen";
 import { Fingerprint } from "@/components/oracle/fingerprint";
 import { StoryShareButton } from "@/components/share/story-share-button";
+import { LumiSays } from "@/components/mascot/lumi-says";
+import { SheetMascot, moodFor } from "@/components/mascot/sheet-mascot";
+import { readingMoment } from "@/lib/lumi-lines";
 import { BottomSheet } from "@/components/ui/bottom-sheet";
 import { IconButton } from "@/components/ui/icon-button";
 import { Skeleton, SkeletonText } from "@/components/ui/skeleton";
@@ -137,6 +140,13 @@ export default function OraclePage() {
     return (
         <Screen
             title="Vị thần quyết định"
+            lumi={
+                answered
+                    ? "oracle_reveal"
+                    : asking
+                      ? "oracle_holding"
+                      : "oracle_idle"
+            }
             subtitle="Khi bạn chỉ cần một câu trả lời để đi tiếp."
             className="flex flex-col"
         >
@@ -401,12 +411,22 @@ export default function OraclePage() {
                 onOpenChange={setSheetOpen}
                 title={draw?.answer.vi}
                 description="Vị thần quyết định"
+                art={<SheetMascot mood={moodFor(readStatus)} />}
                 snapPoints={[0.55, 0.92]}
                 initialSnap={1}
                 showCloseButton
             >
                 {draw && (
                     <div className="space-y-5 pb-8">
+                        <LumiSays
+                            moment={readingMoment(
+                                "oracle",
+                                readStatus,
+                                readErrorStatus,
+                            )}
+                            seed={draw.answer.vi}
+                        />
+
                         {/* Placeholder shaped like what replaces it, so
                             the first words land without shifting
                             anything.

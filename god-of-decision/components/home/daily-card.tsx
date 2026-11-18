@@ -1,9 +1,17 @@
 "use client";
 
-import { motion } from "framer-motion";
+import {
+    motion,
+    useReducedMotion,
+} from "framer-motion";
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 
+import { GREETING_HEIGHT, HomeGreeting } from "@/components/home/home-greeting";
+import { LumiBubble } from "@/components/home/lumi-bubble";
+import { RevealBurst } from "@/components/home/reveal-burst";
+import { Lumi } from "@/components/mascot/lumi";
+import { lumiLine } from "@/lib/lumi-lines";
 import { cardNumeral } from "@/lib/tarot";
 import { cn } from "@/lib/utils";
 import type { TarotCardEntry } from "@/types/tarot";
@@ -31,7 +39,10 @@ const HINT_HEIGHT = 44;
  * app bar (56) + its margin (24) + air above the hint (16)
  * + the hint slot + the space Screen keeps for the tab bar (64)
  */
-const CHROME = 56 + 24 + 16 + HINT_HEIGHT + 64;
+const CHROME = 56 + 24 + GREETING_HEIGHT + 16 + HINT_HEIGHT + 64;
+
+/** When, into the 900ms flip, the stars burst: as the face comes round. */
+const BURST_AT_MS = 380;
 
 /**
  * As wide as the screen allows — but the height budget decides.
@@ -88,6 +99,42 @@ export function DailyCard({
 
     const timer = useRef<number | null>(null);
 
+    const reduced = useReducedMotion();
+
+    /** Set on the turn this visit, so Lumi can react to it. */
+    const [justRevealed, setJustRevealed] = useState(false);
+
+    /** Non-null while the reveal celebration is on screen. */
+    const [burst, setBurst] = useState<number | null>(null);
+    const burstTimers = useRef<number[]>([]);
+
+    useEffect(
+        () => () =>
+            burstTimers.current.forEach((id) => window.clearTimeout(id)),
+        [],
+    );
+
+    function celebrate() {
+        setJustRevealed(true);
+
+        if (reduced) return;
+
+        burstTimers.current.push(
+            window.setTimeout(() => {
+                setBurst(Date.now());
+
+                if ("vibrate" in navigator) {
+                    try {
+                        navigator.vibrate([14, 40, 24]);
+                    } catch {
+                        /* unsupported */
+                    }
+                }
+            }, BURST_AT_MS),
+            window.setTimeout(() => setBurst(null), BURST_AT_MS + 1700),
+        );
+    }
+
     /**
      * Set when a hold completes, cleared by the click that follows it.
      *
@@ -122,6 +169,7 @@ export function DailyCard({
             setHolding(false);
             swallowNextClick.current = true;
             onReveal();
+            celebrate();
         }, HOLD_MS);
     }
 
@@ -142,6 +190,21 @@ export function DailyCard({
               ? "Giữ thêm một chút…"
               : "Giữ để mở lá bài hôm nay";
 
+    const lumiSays = failed
+        ? lumiLine("error")
+        : !card
+          ? null
+          : lumiLine(
+                holding
+                    ? "daily_holding"
+                    : !revealed
+                      ? "daily_idle"
+                      : justRevealed
+                        ? "daily_revealed"
+                        : "daily_return",
+                { seed: card.slug },
+            );
+
     return (
         /*
          * Card and reserved area together form a block of constant
@@ -150,56 +213,77 @@ export function DailyCard({
          * right under the card instead of drifting away from it.
          */
         <div className="flex w-full flex-1 flex-col items-center justify-center">
+            <HomeGreeting />
+
             {/* ==========================================
           CARD
       =========================================== */}
 
-            <button
-                type="button"
-                disabled={!live}
-                aria-label={
-                    revealed && card
-                        ? `${card.name_vn} — chạm để xem ý nghĩa`
-                        : "Giữ để mở lá bài hôm nay"
-                }
-                onPointerDown={start}
-                onPointerUp={cancel}
-                onPointerLeave={cancel}
-                onPointerCancel={cancel}
-                /*
-                 * Only the face up card answers a click. Face down it
-                 * is the hold timer that turns the card, so a plain tap
-                 * has to do nothing — otherwise the gesture the hint
-                 * asks for would be beside the point.
-                 */
-                onClick={() => {
-                    if (swallowNextClick.current) {
-                        swallowNextClick.current = false;
-                        return;
+            <div className="relative">
+                {/* Idle float. Paused while held, so the charge
+                    reads as the card settling into the finger. */}
+                <motion.div
+                    animate={reduced || holding ? { y: 0 } : { y: [0, -7, 0] }}
+                    transition={
+                        reduced || holding
+                            ? { duration: 0.3 }
+                            : {
+                                  duration: 4.2,
+                                  repeat: Infinity,
+                                  ease: "easeInOut",
+                              }
                     }
+                >
+                    <div>
+                        <button
+                            type="button"
+                            disabled={!live}
+                            aria-label={
+                                revealed && card
+                                    ? `${card.name_vn} — chạm để xem ý nghĩa`
+                                    : "Giữ để mở lá bài hôm nay"
+                            }
+                            onPointerDown={start}
+                            onPointerUp={cancel}
+                            onPointerLeave={cancel}
+                            onPointerCancel={cancel}
+                            /*
+                             * Only the face up card answers a click. Face down it
+                             * is the hold timer that turns the card, so a plain tap
+                             * has to do nothing — otherwise the gesture the hint
+                             * asks for would be beside the point.
+                             */
+                            onClick={() => {
+                                if (swallowNextClick.current) {
+                                    swallowNextClick.current = false;
+                                    return;
+                                }
 
-                    if (revealed) onOpenMeaning();
-                }}
-                /* Hold is a pointer gesture, so the keyboard gets a
+                                if (revealed) onOpenMeaning();
+                            }}
+                            /* Hold is a pointer gesture, so the keyboard gets a
                    plain activation instead of being asked to hold a
                    key down. */
-                onKeyDown={(event) => {
-                    if (event.key !== "Enter" && event.key !== " ") {
-                        return;
-                    }
+                            onKeyDown={(event) => {
+                                if (
+                                    event.key !== "Enter" &&
+                                    event.key !== " "
+                                ) {
+                                    return;
+                                }
 
-                    // Stops the browser turning this into a click as
-                    // well, which would run both branches.
-                    event.preventDefault();
+                                // Stops the browser turning this into a click as
+                                // well, which would run both branches.
+                                event.preventDefault();
 
-                    if (revealed) {
-                        onOpenMeaning();
-                        return;
-                    }
+                                if (revealed) {
+                                    onOpenMeaning();
+                                    return;
+                                }
 
-                    if (canTurn) onReveal();
-                }}
-                className="
+                                if (canTurn) onReveal();
+                            }}
+                            className="
           relative
           select-none
           [-webkit-touch-callout:none]
@@ -214,71 +298,93 @@ export function DailyCard({
              roughly 7% of the card's width. */
           rounded-[16px]
         "
-                style={{ touchAction: "manipulation", width: CARD_WIDTH }}
-            >
-                {/* Idle breath. Decoration only: if this animation
+                            style={{
+                                touchAction: "manipulation",
+                                width: CARD_WIDTH,
+                            }}
+                        >
+                            {/* Idle breath. Decoration only: if this animation
                     never runs, the card is still fully visible. */}
-                {!revealed && (
-                    <motion.span
-                        className="pointer-events-none absolute -inset-6 -z-10 rounded-[44px] bg-secondary-300/25 blur-2xl"
-                        animate={{ opacity: [0.45, 0.9, 0.45] }}
-                        transition={{
-                            duration: 3.2,
-                            repeat: Infinity,
-                            ease: "easeInOut",
-                        }}
-                        aria-hidden="true"
-                    />
-                )}
+                            {!revealed && (
+                                <motion.span
+                                    className="pointer-events-none absolute -inset-6 -z-10 rounded-[44px] bg-secondary-300/25 blur-2xl"
+                                    animate={{ opacity: [0.45, 0.9, 0.45] }}
+                                    transition={{
+                                        duration: 3.2,
+                                        repeat: Infinity,
+                                        ease: "easeInOut",
+                                    }}
+                                    aria-hidden="true"
+                                />
+                            )}
 
-                {/* Charge. Grows for exactly as long as the hold
+                            {/* Charge. Grows for exactly as long as the hold
                     needs, so the finger can see how far it has got. */}
-                <span
-                    className="pointer-events-none absolute -inset-6 -z-10 rounded-[44px] bg-secondary-300/45 blur-2xl transition-opacity ease-out"
-                    style={{
-                        opacity: holding ? 1 : 0,
-                        transitionDuration: `${
-                            holding ? HOLD_MS : RELEASE_MS
-                        }ms`,
-                    }}
-                    aria-hidden="true"
+                            <span
+                                className="pointer-events-none absolute -inset-6 -z-10 rounded-[44px] bg-secondary-300/45 blur-2xl transition-opacity ease-out"
+                                style={{
+                                    opacity: holding ? 1 : 0,
+                                    transitionDuration: `${
+                                        holding ? HOLD_MS : RELEASE_MS
+                                    }ms`,
+                                }}
+                                aria-hidden="true"
+                            />
+
+                            <span
+                                className="pointer-events-none absolute -inset-[5px] rounded-[21px] border border-white/70 transition-opacity ease-out"
+                                style={{
+                                    opacity: holding ? 1 : 0,
+                                    transitionDuration: `${
+                                        holding ? HOLD_MS : RELEASE_MS
+                                    }ms`,
+                                }}
+                                aria-hidden="true"
+                            />
+
+                            {/* Pressing in */}
+                            <span
+                                className="block transition-transform ease-out"
+                                style={{
+                                    transform: holding
+                                        ? "scale(0.96)"
+                                        : "scale(1)",
+                                    transitionDuration: `${
+                                        holding ? HOLD_MS : RELEASE_MS
+                                    }ms`,
+                                }}
+                            >
+                                <motion.span
+                                    className="relative block aspect-[2/3] w-full"
+                                    style={{ transformStyle: "preserve-3d" }}
+                                    animate={{ rotateY: revealed ? 180 : 0 }}
+                                    transition={{
+                                        duration: 0.9,
+                                        ease: [0.22, 1, 0.36, 1],
+                                    }}
+                                >
+                                    <CardBackHero />
+                                    <CardFaceHero card={card} />
+                                </motion.span>
+
+                            </span>
+                        </button>
+                    </div>
+                </motion.div>
+
+                {burst !== null && <RevealBurst seed={burst} />}
+
+                <LumiBubble
+                    message={lumiSays}
+                    sticky={holding}
+                    className="-right-1 bottom-[150px] z-10"
                 />
 
-                <span
-                    className="pointer-events-none absolute -inset-[5px] rounded-[21px] border border-white/70 transition-opacity ease-out"
-                    style={{
-                        opacity: holding ? 1 : 0,
-                        transitionDuration: `${
-                            holding ? HOLD_MS : RELEASE_MS
-                        }ms`,
-                    }}
-                    aria-hidden="true"
-                />
-
-                {/* Pressing in */}
-                <span
-                    className="block transition-transform ease-out"
-                    style={{
-                        transform: holding ? "scale(0.96)" : "scale(1)",
-                        transitionDuration: `${
-                            holding ? HOLD_MS : RELEASE_MS
-                        }ms`,
-                    }}
-                >
-                    <motion.span
-                        className="relative block aspect-[2/3] w-full"
-                        style={{ transformStyle: "preserve-3d" }}
-                        animate={{ rotateY: revealed ? 180 : 0 }}
-                        transition={{
-                            duration: 0.9,
-                            ease: [0.22, 1, 0.36, 1],
-                        }}
-                    >
-                        <CardBackHero />
-                        <CardFaceHero card={card} />
-                    </motion.span>
-                </span>
-            </button>
+                {/* Lumi keeps the card company from its lower corner.
+                Pointer-transparent, so the hold gesture still lands
+                on the card underneath. */}
+                <Lumi className="absolute -bottom-3 -right-4 h-44 w-36" />
+            </div>
 
             {/* ==========================================
           HINT

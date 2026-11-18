@@ -6,11 +6,10 @@ interface OracleMarkProps {
 }
 
 /**
- * The oracle's face, cropped into a circle.
+ * Lumi's face, cropped into a circle. See docs/MASCOT.md.
  *
- * The background sizing is the whole trick: the source artwork is a
- * full portrait, so it is blown up to 190% and pulled up to 14% to
- * land the face inside the circle at any diameter.
+ * lumi-face.webp is already framed on the head and hat, so it simply
+ * covers the circle at any diameter.
  */
 export function OracleMark({ className }: OracleMarkProps) {
     return (
@@ -22,9 +21,9 @@ export function OracleMark({ className }: OracleMarkProps) {
 
                 "bg-secondary-100",
 
-                "bg-[url(/images/avt_img.webp)]",
-                "bg-[length:190%]",
-                "bg-[position:50%_14%]",
+                "bg-[url(/images/mascot/lumi-face.webp)]",
+                "bg-cover",
+                "bg-center",
                 "bg-no-repeat",
 
                 "ring-2 ring-white/60",

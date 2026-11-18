@@ -5,6 +5,7 @@ import Link from "next/link";
 import { BookOpen, RefreshCw, WifiOff } from "lucide-react";
 
 import { Screen } from "@/components/layout/screen";
+import { LumiSays } from "@/components/mascot/lumi-says";
 import { useOnlineStatus } from "@/hooks/use-online-status";
 
 export default function OfflinePage() {
@@ -28,6 +29,13 @@ export default function OfflinePage() {
                     Cần kết nối mạng để rút bài và nhận lời luận. Nhật ký của
                     bạn vẫn ở đây, đọc lại lúc nào cũng được.
                 </p>
+
+                <LumiSays
+                    moment="offline"
+                    from="avatar"
+                    tone="dark"
+                    className="mt-6 justify-center text-left"
+                />
 
                 <div className="mt-9 flex flex-col gap-3 self-stretch">
                     {online && (

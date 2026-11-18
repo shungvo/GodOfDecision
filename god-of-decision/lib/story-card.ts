@@ -257,10 +257,11 @@ function paintBackground(ctx: CanvasRenderingContext2D) {
 }
 
 /**
- * The oracle's face, cropped to a circle.
+ * Lumi's face, cropped to a circle.
  *
- * Same 190% / 50% 14% crop as components/brand/oracle-mark.tsx, so
- * the avatar is framed identically to every other place it appears.
+ * The art is the same square, pre-framed crop that
+ * components/brand/oracle-mark.tsx covers its circle with, so drawing
+ * it edge to edge frames it identically.
  */
 function paintMark(
     ctx: CanvasRenderingContext2D,
@@ -269,22 +270,13 @@ function paintMark(
     cy: number,
     d: number,
 ) {
-    const w = d * 1.9;
-    const h = w * (art.naturalHeight / art.naturalWidth);
-
     ctx.save();
 
     ctx.beginPath();
     ctx.arc(cx, cy, d / 2, 0, Math.PI * 2);
     ctx.clip();
 
-    ctx.drawImage(
-        art,
-        cx - d / 2 - (w - d) * 0.5,
-        cy - d / 2 - (h - d) * 0.14,
-        w,
-        h,
-    );
+    ctx.drawImage(art, cx - d / 2, cy - d / 2, d, d);
 
     ctx.restore();
 
@@ -632,7 +624,7 @@ export async function renderStoryCard(card: StoryCard): Promise<File> {
         await document.fonts.ready;
     }
 
-    const art = await loadImage("/images/avt_img.webp");
+    const art = await loadImage("/images/mascot/lumi-face.webp");
 
     paintBackground(ctx);
     paintBrand(ctx, art, SAFE_TOP);

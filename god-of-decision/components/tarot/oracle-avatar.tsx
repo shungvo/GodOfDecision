@@ -1,10 +1,8 @@
 /**
- * The oracle, for the corner of a sheet header.
+ * Lumi, the mascot, for the corner of a sheet header.
  *
- * The artwork is a full square illustration, so it is used as a
- * cropped background rather than an <img>: that lets the face be
- * framed inside the circle without shipping a second, pre-cropped
- * file.
+ * Same pre-framed face crop as OracleMark, as a background so the
+ * circle clips it.
  */
 export function OracleAvatar() {
     return (
@@ -26,9 +24,9 @@ export function OracleAvatar() {
 
           bg-secondary-100
 
-          bg-[url(/images/avt_img.webp)]
-          bg-[length:190%]
-          bg-[position:50%_14%]
+          bg-[url(/images/mascot/lumi-face.webp)]
+          bg-cover
+          bg-center
           bg-no-repeat
 
           ring-2

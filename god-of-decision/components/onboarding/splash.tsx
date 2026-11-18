@@ -44,9 +44,9 @@ export function Splash() {
 
               bg-secondary-100
 
-              bg-[url(/images/avt_img.webp)]
-              bg-[length:190%]
-              bg-[position:50%_14%]
+              bg-[url(/images/mascot/lumi-face.webp)]
+              bg-cover
+              bg-center
               bg-no-repeat
 
               ring-2
